@@ -21,6 +21,10 @@ public class Product {
 
     private Integer amount;
 
+    public void decreaseAmount(Integer deAmount){
+        this.amount -= deAmount;
+    }
+
     @Builder
     public Product(String name, Integer price, Integer amount){
         this.name = name;

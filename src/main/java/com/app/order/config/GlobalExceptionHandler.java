@@ -1,5 +1,6 @@
 package com.app.order.config;
 
+import com.app.order.util.OrderException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,5 +16,14 @@ public class GlobalExceptionHandler {
         log.error(errorMessage);
 
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({OrderException.class})
+    public ResponseEntity<String> handleOrderException(OrderException ex) {
+        String errorMessage = ex.getMessage();
+
+        log.error(errorMessage);
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
