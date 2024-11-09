@@ -7,8 +7,10 @@ import com.app.order.dto.CreateOrderDTO;
 import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.repository.OrderRepository;
 import com.app.order.repository.ProductRepository;
+import com.app.order.util.OrderCancelException;
 import com.app.order.util.OrderException;
 import com.app.order.util.OrderStateComparator;
+import com.app.order.util.OrderStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,31 @@ public class OrderService {
         order.modifyState(OrderStateComparator.comparator(state));
 
         return ResponseOrderDTO.toDto(order, productList);
+    }
+
+    public List<ResponseOrderDTO> findByState(String state){
+        OrderStatus orderStatus = OrderStateComparator.comparator(state);
+        List<Order> orderList = orderRepository.findAllByState(orderStatus);
+        List<ResponseOrderDTO> dtoList = new ArrayList<>();
+
+        for(Order order : orderList){
+            List<Product> productList = productMapping(order.getRelations());
+            ResponseOrderDTO dto = ResponseOrderDTO.toDto(order, productList);
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
+    @Transactional
+    public ResponseOrderDTO deleteOrder(Long id){
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
+        if(!OrderStatus.CREATED.equals(order.getState())) throw new OrderCancelException("이미 취소되었거나 취소할 수 없는 상품입니다.");
+
+        order.modifyState(OrderStatus.CANCELED);
+
+        return ResponseOrderDTO.toDto(order, productMapping(order.getRelations()));
     }
 
     public List<Product> productMapping(List<ProductOrderRelation> relationList){

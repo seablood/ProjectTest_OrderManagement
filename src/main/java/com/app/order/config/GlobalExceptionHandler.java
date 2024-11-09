@@ -1,5 +1,6 @@
 package com.app.order.config;
 
+import com.app.order.util.OrderCancelException;
 import com.app.order.util.OrderException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({OrderException.class})
     public ResponseEntity<String> handleOrderException(OrderException ex) {
         String errorMessage = ex.getMessage();
+        log.error(errorMessage);
 
+        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({OrderCancelException.class})
+    public ResponseEntity<String> handleOrderCancelException(OrderCancelException ex){
+        String errorMessage = ex.getMessage();
         log.error(errorMessage);
 
         return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
