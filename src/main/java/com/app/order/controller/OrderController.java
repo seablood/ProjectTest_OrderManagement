@@ -5,6 +5,7 @@ import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class OrderController {
 
     @Operation(summary = "주문 생성", description = "상품 ID와 수량을 입력 받아 주문을 생성하고 DB에 저장")
     @PostMapping("/orders")
-    public ResponseEntity<ResponseOrderDTO> save(@RequestBody List<CreateOrderDTO> createOrderDTOList){
+    public ResponseEntity<ResponseOrderDTO> save(@RequestBody @Valid List<CreateOrderDTO> createOrderDTOList){
         ResponseOrderDTO order = orderService.save(createOrderDTOList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(order);

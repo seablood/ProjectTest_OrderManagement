@@ -4,6 +4,7 @@ import com.app.order.domain.Product;
 import com.app.order.dto.CreateProductDTO;
 import com.app.order.dto.ResponseProductDTO;
 import com.app.order.repository.ProductRepository;
+import com.app.order.util.ValidationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ValidationService validationService;
 
     @Transactional
     public ResponseProductDTO save(CreateProductDTO dto){
-        return ResponseProductDTO.toDto(productRepository.save(CreateProductDTO.toEntity(dto)));
-    }
+        Product product = CreateProductDTO.toEntity(dto);
+        validationService.checkValid(product);
 
-    public Product findById(Long id){
-        return productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+        return ResponseProductDTO.toDto(productRepository.save(product));
     }
 
     public List<ResponseProductDTO> findAll(){

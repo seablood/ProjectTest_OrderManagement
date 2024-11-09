@@ -5,6 +5,7 @@ import com.app.order.dto.ResponseProductDTO;
 import com.app.order.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ProductController {
 
     @Operation(summary = "상품 추가", description = "상품 정보를 입력 받고 해당 상품을 DB에 저장")
     @PostMapping("/save")
-    public ResponseEntity<ResponseProductDTO> save(@RequestBody CreateProductDTO dto){
+    public ResponseEntity<ResponseProductDTO> save(@RequestBody @Valid CreateProductDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(dto));
     }
 
