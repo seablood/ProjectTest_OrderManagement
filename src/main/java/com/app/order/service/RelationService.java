@@ -14,10 +14,11 @@ public class RelationService {
     private final ProductOrderRelationRepository productOrderRelationRepository;
 
     @Transactional
-    public void save(Order order, Product product){
+    public void save(Order order, Product product, Integer amount){
         ProductOrderRelation relation = ProductOrderRelation.builder()
                 .order(order)
                 .product(product)
+                .amount(amount)
                 .build();
 
         productOrderRelationRepository.save(relation);

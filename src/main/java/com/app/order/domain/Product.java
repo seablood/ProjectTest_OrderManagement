@@ -34,6 +34,10 @@ public class Product {
         this.amount -= deAmount;
     }
 
+    public void increaseAmount(Integer inAmount){
+        this.amount += inAmount;
+    }
+
     public void checkAmount(Integer amount){
         if(this.amount < amount){
             throw new OrderException(this.id + "번 상품의 수량이 부족합니다.");

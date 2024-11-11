@@ -1,6 +1,7 @@
 package com.app.order.service;
 
 import com.app.order.domain.Product;
+import com.app.order.domain.ProductOrderRelation;
 import com.app.order.dto.CreateProductDTO;
 import com.app.order.dto.ResponseProductDTO;
 import com.app.order.repository.ProductRepository;
@@ -29,5 +30,16 @@ public class ProductService {
         return productRepository.findAll().stream()
                 .map(product -> ResponseProductDTO.toDto(product))
                 .toList();
+    }
+
+    public List<Product> productMapping(List<ProductOrderRelation> relationList){
+        return relationList.stream()
+                .map(productOrderRelation -> productOrderRelation.getProduct())
+                .toList();
+    }
+
+    public void cancelAmount(List<ProductOrderRelation> relationList){
+        relationList.stream()
+                .forEach(productOrderRelation -> productOrderRelation.getProduct().increaseAmount(productOrderRelation.getAmount()));
     }
 }

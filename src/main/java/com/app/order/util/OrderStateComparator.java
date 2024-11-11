@@ -9,7 +9,6 @@ public class OrderStateComparator {
         if(state.equals(OrderStatus.CREATED.toString())) return OrderStatus.CREATED;
         else if(state.equals(OrderStatus.SHIPPING.toString())) return OrderStatus.SHIPPING;
         else if(state.equals(OrderStatus.COMPLETED.toString())) return OrderStatus.COMPLETED;
-        else if(state.equals(OrderStatus.CANCELED.toString())) return OrderStatus.CANCELED;
         else throw new OrderException("상태 변경 오류");
     }
 }

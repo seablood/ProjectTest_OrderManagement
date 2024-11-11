@@ -2,7 +2,6 @@ package com.app.order.service;
 
 import com.app.order.domain.Order;
 import com.app.order.domain.Product;
-import com.app.order.domain.ProductOrderRelation;
 import com.app.order.dto.CreateOrderDTO;
 import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.repository.OrderRepository;
@@ -22,6 +21,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final RelationService relationService;
+    private final ProductService productService;
 
     @Transactional
     public ResponseOrderDTO save(List<CreateOrderDTO> createOrderDTOList){
@@ -34,9 +34,10 @@ public class OrderService {
             product.checkAmount(createOrderDTO.getAmount());
             productList.add(product);
 
-            product.decreaseAmount(createOrderDTO.getAmount());
-            order.increaseTotalPrice(product.getPrice() * createOrderDTO.getAmount());
-            relationService.save(order, product);
+            Integer amount = createOrderDTO.getAmount();
+            product.decreaseAmount(amount);
+            order.increaseTotalPrice(product.getPrice() * amount);
+            relationService.save(order, product, amount);
         }
 
         return ResponseOrderDTO.toDto(orderRepository.save(order), productList);
@@ -45,7 +46,7 @@ public class OrderService {
     public ResponseOrderDTO findById(Long id){
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
-        List<Product> productList = productMapping(order.getRelations());
+        List<Product> productList = productService.productMapping(order.getRelations());
 
         return ResponseOrderDTO.toDto(order, productList);
     }
@@ -57,7 +58,7 @@ public class OrderService {
         }
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
-        List<Product> productList = productMapping(order.getRelations());
+        List<Product> productList = productService.productMapping(order.getRelations());
 
         order.modifyState(OrderStateComparator.comparator(state));
 
@@ -70,7 +71,7 @@ public class OrderService {
         List<ResponseOrderDTO> dtoList = new ArrayList<>();
 
         for(Order order : orderList){
-            List<Product> productList = productMapping(order.getRelations());
+            List<Product> productList = productService.productMapping(order.getRelations());
             ResponseOrderDTO dto = ResponseOrderDTO.toDto(order, productList);
             dtoList.add(dto);
         }
@@ -85,13 +86,8 @@ public class OrderService {
 
         order.checkState();
         order.modifyState(OrderStatus.CANCELED);
+        productService.cancelAmount(order.getRelations());
 
-        return ResponseOrderDTO.toDto(order, productMapping(order.getRelations()));
-    }
-
-    public List<Product> productMapping(List<ProductOrderRelation> relationList){
-        return relationList.stream()
-                .map(productOrderRelation -> productOrderRelation.getProduct())
-                .toList();
+        return ResponseOrderDTO.toDto(order, productService.productMapping(order.getRelations()));
     }
 }

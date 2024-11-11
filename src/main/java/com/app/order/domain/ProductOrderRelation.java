@@ -27,9 +27,12 @@ public class ProductOrderRelation {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Product product;
 
+    private Integer amount;
+
     @Builder
-    public ProductOrderRelation(Order order, Product product){
+    public ProductOrderRelation(Order order, Product product, Integer amount){
         this.order = order;
         this.product = product;
+        this.amount = amount;
     }
 }
