@@ -7,8 +7,6 @@ import com.app.order.dto.CreateOrderDTO;
 import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.repository.OrderRepository;
 import com.app.order.repository.ProductRepository;
-import com.app.order.util.OrderCancelException;
-import com.app.order.util.OrderException;
 import com.app.order.util.OrderStateComparator;
 import com.app.order.util.OrderStatus;
 import jakarta.transaction.Transactional;
@@ -33,9 +31,7 @@ public class OrderService {
         for(CreateOrderDTO createOrderDTO : createOrderDTOList){
             Product product = productRepository.findById(createOrderDTO.getId())
                     .orElseThrow(() -> new IllegalArgumentException("Product를 찾지 못했습니다."));
-            if(createOrderDTO.getAmount() > product.getAmount()){
-                throw new OrderException(createOrderDTO.getId() + "번 상품의 수량이 부족합니다.");
-            }
+            product.checkAmount(createOrderDTO.getAmount());
             productList.add(product);
 
             product.decreaseAmount(createOrderDTO.getAmount());
@@ -56,6 +52,9 @@ public class OrderService {
 
     @Transactional
     public ResponseOrderDTO modifyState(Long id, String state){
+        if(OrderStatus.CANCELED.toString().equals(state)){
+            return deleteOrder(id);
+        }
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
         List<Product> productList = productMapping(order.getRelations());
@@ -83,8 +82,8 @@ public class OrderService {
     public ResponseOrderDTO deleteOrder(Long id){
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
-        if(!OrderStatus.CREATED.equals(order.getState())) throw new OrderCancelException("이미 취소되었거나 취소할 수 없는 상품입니다.");
 
+        order.checkState();
         order.modifyState(OrderStatus.CANCELED);
 
         return ResponseOrderDTO.toDto(order, productMapping(order.getRelations()));

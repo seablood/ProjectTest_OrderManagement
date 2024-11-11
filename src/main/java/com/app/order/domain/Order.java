@@ -1,5 +1,6 @@
 package com.app.order.domain;
 
+import com.app.order.util.OrderCancelException;
 import com.app.order.util.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -21,7 +22,7 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private List<ProductOrderRelation> relations = new ArrayList<>();
 
-    private Integer totalPrice;
+    private int totalPrice;
 
     @Enumerated(value = EnumType.STRING)
     private OrderStatus state;
@@ -32,6 +33,12 @@ public class Order {
 
     public void modifyState(OrderStatus state){
         this.state = state;
+    }
+
+    public void checkState(){
+        if(!this.state.equals(OrderStatus.CREATED)){
+            throw new OrderCancelException("이미 취소되었거나 취소할 수 없는 상품입니다.");
+        }
     }
 
     @Builder

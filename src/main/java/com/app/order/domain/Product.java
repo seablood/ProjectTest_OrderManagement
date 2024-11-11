@@ -1,5 +1,6 @@
 package com.app.order.domain;
 
+import com.app.order.util.OrderException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -31,6 +32,12 @@ public class Product {
 
     public void decreaseAmount(Integer deAmount){
         this.amount -= deAmount;
+    }
+
+    public void checkAmount(Integer amount){
+        if(this.amount < amount){
+            throw new OrderException(this.id + "번 상품의 수량이 부족합니다.");
+        }
     }
 
     @Builder
