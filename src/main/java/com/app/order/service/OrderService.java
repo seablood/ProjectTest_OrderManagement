@@ -85,7 +85,6 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
 
         order.checkState();
-        order.modifyState(OrderStatus.CANCELED);
         productService.cancelAmount(order.getRelations());
 
         return ResponseOrderDTO.toDto(order, productService.productMapping(order.getRelations()));

@@ -36,9 +36,8 @@ public class Order {
     }
 
     public void checkState(){
-        if(!this.state.equals(OrderStatus.CREATED)){
-            throw new OrderCancelException("이미 취소되었거나 취소할 수 없는 상품입니다.");
-        }
+        this.state.checkState();
+        this.state = OrderStatus.CANCELED;
     }
 
     @Builder

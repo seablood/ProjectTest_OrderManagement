@@ -23,16 +23,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({OrderException.class})
-    public ResponseEntity<String> handleOrderException(OrderException ex) {
-        String errorMessage = ex.getMessage();
-        log.error(errorMessage);
-
-        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler({OrderCancelException.class})
-    public ResponseEntity<String> handleOrderCancelException(OrderCancelException ex){
+    @ExceptionHandler({OrderException.class,
+                        OrderCancelException.class})
+    public ResponseEntity<String> handleOrderException(Exception ex) {
         String errorMessage = ex.getMessage();
         log.error(errorMessage);
 
