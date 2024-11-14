@@ -19,7 +19,6 @@ public class RelationService {
 
     private final ProductRepository productRepository;
 
-    @Transactional
     public void save(Order order, Product product, Integer amount){
         ProductOrderRelation relation = ProductOrderRelation.builder()
                 .order(order)
