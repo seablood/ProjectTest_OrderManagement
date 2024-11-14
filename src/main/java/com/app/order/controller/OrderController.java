@@ -3,6 +3,7 @@ package com.app.order.controller;
 import com.app.order.dto.CreateOrderDTO;
 import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.service.OrderService;
+import com.app.order.service.RelationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import java.util.List;
 @Tag(name = "주문 기능", description = "주문 관련 API")
 public class OrderController {
     private final OrderService orderService;
+
+    private final RelationService relationService;
 
     @Operation(summary = "주문 생성", description = "상품 ID와 수량을 입력 받아 주문을 생성하고 DB에 저장")
     @PostMapping("/orders")
@@ -50,5 +53,12 @@ public class OrderController {
     @DeleteMapping("/orders/{id}/cancel")
     public ResponseEntity<ResponseOrderDTO> deleteOrder(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(orderService.deleteOrder(id));
+    }
+
+    @Operation(summary = "주문 취소(부분 취소)", description = "특정 주문의 상태를 확인하고 부분 취소 실행")
+    @DeleteMapping("/orders/{id}/product-cancel")
+    public ResponseEntity<ResponseOrderDTO> deleteOrderedProduct(@PathVariable Long id, @RequestParam String name){
+        relationService.deleteRelation(id, name);
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.findById(id));
     }
 }

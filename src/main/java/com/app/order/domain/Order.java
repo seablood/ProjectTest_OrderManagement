@@ -1,6 +1,5 @@
 package com.app.order.domain;
 
-import com.app.order.util.OrderCancelException;
 import com.app.order.util.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -31,13 +30,16 @@ public class Order {
         this.totalPrice += price;
     }
 
+    public void decreaseTotalPrice(Integer price){
+        this.totalPrice -= price;
+    }
+
     public void modifyState(OrderStatus state){
         this.state = state;
     }
 
     public void checkState(){
         this.state.checkState();
-        this.state = OrderStatus.CANCELED;
     }
 
     @Builder

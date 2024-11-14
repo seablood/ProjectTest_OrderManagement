@@ -19,6 +19,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     @Size(min = 1, max = 100, message = "상품명은 100자 이하까지 허용됩니다.")
     private String name;
 

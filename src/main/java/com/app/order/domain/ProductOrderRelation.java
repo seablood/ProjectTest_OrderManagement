@@ -30,12 +30,15 @@ public class ProductOrderRelation {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Product product;
 
+    private Integer price;
+
     private Integer amount;
 
     @Builder
-    public ProductOrderRelation(Order order, Product product, Integer amount){
+    public ProductOrderRelation(Order order, Product product, Integer price, Integer amount){
         this.order = order;
         this.product = product;
+        this.price = price;
         this.amount = amount;
     }
 }
