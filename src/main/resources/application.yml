@@ -24,3 +24,10 @@ spring:
   h2:
     console:
       enabled: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev

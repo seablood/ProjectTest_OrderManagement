@@ -34,6 +34,15 @@ public class ProductOrderRelation {
 
     private Integer amount;
 
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    public boolean matchOrderAndProduct(Order order, Product product){
+        if(this.order.equals(order) && this.product.equals(product)) return true;
+        return false;
+    }
+
     @Builder
     public ProductOrderRelation(Order order, Product product, Integer price, Integer amount){
         this.order = order;

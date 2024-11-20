@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,19 +25,7 @@ public class OrderService {
     @Transactional
     public ResponseOrderDTO save(List<CreateOrderDTO> createOrderDTOList){
         Order order = CreateOrderDTO.toEntity();
-        List<Product> productList = new ArrayList<>();
-
-        for(CreateOrderDTO createOrderDTO : createOrderDTOList){
-            Product product = productRepository.findById(createOrderDTO.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product를 찾지 못했습니다."));
-            product.checkAmount(createOrderDTO.getAmount());
-            productList.add(product);
-
-            Integer amount = createOrderDTO.getAmount();
-            product.decreaseAmount(amount);
-            order.increaseTotalPrice(product.getPrice() * amount);
-            relationService.save(order, product, amount);
-        }
+        List<Product> productList = makeProductList(createOrderDTOList, order);
 
         return ResponseOrderDTO.toDto(orderRepository.save(order), productList);
     }
@@ -68,13 +55,13 @@ public class OrderService {
     public List<ResponseOrderDTO> findByState(String state){
         OrderStatus orderStatus = OrderStateComparator.comparator(state);
         List<Order> orderList = orderRepository.findAllByState(orderStatus);
-        List<ResponseOrderDTO> dtoList = new ArrayList<>();
+        List<ResponseOrderDTO> dtoList = orderList.stream()
+                .map(order -> {
+                    List<Product> productList = productService.productMapping(order.getRelations());
+                    ResponseOrderDTO dto = ResponseOrderDTO.toDto(order, productList);
+                    return dto;
+                }).toList();
 
-        for(Order order : orderList){
-            List<Product> productList = productService.productMapping(order.getRelations());
-            ResponseOrderDTO dto = ResponseOrderDTO.toDto(order, productList);
-            dtoList.add(dto);
-        }
 
         return dtoList;
     }
@@ -89,5 +76,18 @@ public class OrderService {
         productService.cancelAmount(order.getRelations());
 
         return ResponseOrderDTO.toDto(order, productService.productMapping(order.getRelations()));
+    }
+
+    public List<Product> makeProductList(List<CreateOrderDTO> createOrderDTOList, Order order){
+        return createOrderDTOList.stream()
+                .map(dto -> {
+                    Product product = productRepository.findById(dto.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Product를 찾지 못했습니다."));
+                    product.checkAmount(dto.getAmount());
+                    product.decreaseAmount(dto.getAmount());
+                    order.increaseTotalPrice(product.getPrice() * dto.getAmount());
+                    relationService.save(order, product, dto.getAmount());
+                    return product;
+                }).toList();
     }
 }

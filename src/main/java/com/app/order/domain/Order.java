@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -40,6 +41,36 @@ public class Order {
 
     public void checkState(){
         this.state.checkState();
+    }
+
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    public boolean sameState(OrderStatus orderStatus){
+        if(this.state == orderStatus) return true;
+        return false;
+    }
+
+    public void addRelation(ProductOrderRelation relation){
+        this.relations.add(relation);
+    }
+
+    public void deleteRelation(ProductOrderRelation relation){
+        this.relations.remove(relation);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || (getClass() != o.getClass())) return false;
+        Order order = (Order) o;
+        return Objects.equals(id, order.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Builder
