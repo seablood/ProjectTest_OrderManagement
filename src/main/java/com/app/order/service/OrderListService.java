@@ -3,6 +3,7 @@ package com.app.order.service;
 import com.app.order.domain.Order;
 import com.app.order.domain.Product;
 import com.app.order.dto.CreateOrderDTO;
+import com.app.order.dto.ModifyStateDTO;
 import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.repository.OrderListRepositoryInf;
 import com.app.order.repository.ProductListRepositoryInf;
@@ -40,7 +41,8 @@ public class OrderListService {
         return ResponseOrderDTO.toDto(order, productlist);
     }
 
-    public ResponseOrderDTO modifyState(Long id, String state){
+    public ResponseOrderDTO modifyState(Long id, ModifyStateDTO stateDTO){
+        String state = stateDTO.getState();
         if(OrderStatus.CANCELED.toString().equals(state)){
             return deleteOrder(id);
         }

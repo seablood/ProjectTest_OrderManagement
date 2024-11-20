@@ -5,16 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "product")
 public class Product {
     @Id
@@ -53,6 +51,10 @@ public class Product {
 
     public boolean sameName(String name){
         return this.name.equals(name);
+    }
+
+    public boolean sameId(Long id){
+        return this.id.equals(id);
     }
 
     @Override

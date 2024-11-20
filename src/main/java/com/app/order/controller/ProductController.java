@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/product")
 @Tag(name = "상품 기능", description = "상품 관련 API")
 public class ProductController {
-    private final ProductService productService;
+    private final ProductListService productService;
 
     @Operation(summary = "상품 추가", description = "상품 정보를 입력 받고 해당 상품을 DB에 저장")
     @PostMapping("/save")

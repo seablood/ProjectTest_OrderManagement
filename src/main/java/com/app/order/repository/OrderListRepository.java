@@ -25,7 +25,10 @@ public class OrderListRepository implements OrderListRepositoryInf{
 
     @Override
     public Order findById(Long id) {
-        return orderMap.get(id);
+        return orderMap.values().stream()
+                .filter(order -> order.sameId(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Order를 찾지 못했습니다."));
     }
 
     @Override

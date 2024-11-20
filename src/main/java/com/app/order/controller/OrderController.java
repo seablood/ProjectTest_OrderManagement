@@ -1,6 +1,7 @@
 package com.app.order.controller;
 
 import com.app.order.dto.CreateOrderDTO;
+import com.app.order.dto.ModifyStateDTO;
 import com.app.order.dto.ResponseOrderDTO;
 import com.app.order.service.OrderListService;
 import com.app.order.service.OrderService;
@@ -21,9 +22,9 @@ import java.util.List;
 @RequestMapping("/api/order")
 @Tag(name = "주문 기능", description = "주문 관련 API")
 public class OrderController {
-    private final OrderService orderService;
+    private final OrderListService orderService;
 
-    private final RelationService relationService;
+    private final RelationListService relationService;
 
     @Operation(summary = "주문 생성", description = "상품 ID와 수량을 입력 받아 주문을 생성하고 DB에 저장")
     @PostMapping("/orders")
@@ -35,8 +36,8 @@ public class OrderController {
 
     @Operation(summary = "주문 상태 변경", description = "특정 주문의 상태를 변경하여 저장")
     @PutMapping("/orders/{id}")
-    public ResponseEntity<ResponseOrderDTO> modifyState(@PathVariable Long id, @RequestBody String state){
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.modifyState(id, state));
+    public ResponseEntity<ResponseOrderDTO> modifyState(@PathVariable Long id, @RequestBody ModifyStateDTO stateDTO){
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.modifyState(id, stateDTO));
     }
 
     @Operation(summary = "주문 검색(ID)", description = "특정 주문을 검색")

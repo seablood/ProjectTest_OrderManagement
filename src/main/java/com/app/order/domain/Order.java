@@ -52,6 +52,10 @@ public class Order {
         return false;
     }
 
+    public boolean sameId(Long id){
+        return this.id.equals(id);
+    }
+
     public void addRelation(ProductOrderRelation relation){
         this.relations.add(relation);
     }
