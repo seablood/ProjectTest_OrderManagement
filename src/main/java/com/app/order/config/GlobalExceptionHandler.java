@@ -1,5 +1,6 @@
 package com.app.order.config;
 
+import com.app.order.dto.ErrorMessageDTO;
 import com.app.order.util.OrderCancelException;
 import com.app.order.util.OrderException;
 import lombok.extern.slf4j.Slf4j;
@@ -10,36 +11,41 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex){
-        String errorMessage = ex.getMessage();
-        log.error(errorMessage);
+    public ResponseEntity<ErrorMessageDTO> handleIllegalArgumentException(IllegalArgumentException ex){
+        List<String> errorMessages = new ArrayList<>(Collections.singleton(ex.getMessage()));
+        ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(errorMessages);
+        log.error(errorMessageDTO.getErrorMessages().toString());
 
-        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorMessageDTO, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({OrderException.class,
                         OrderCancelException.class})
-    public ResponseEntity<String> handleOrderException(Exception ex) {
-        String errorMessage = ex.getMessage();
-        log.error(errorMessage);
+    public ResponseEntity<ErrorMessageDTO> handleOrderException(Exception ex) {
+        List<String> errorMessages = new ArrayList<>(Collections.singleton(ex.getMessage()));
+        ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(errorMessages);
+        log.error(errorMessageDTO.getErrorMessages().toString());
 
-        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorMessageDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorMessageDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
         final List<FieldError> errorMessages = ex.getBindingResult().getFieldErrors();
         final List<String> errorMessage = errorMessages.stream()
                 .map(error -> error.getDefaultMessage())
                 .toList();
-        log.error(errorMessage.toString());
+        ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(errorMessage);
+        log.error(errorMessageDTO.getErrorMessages().toString());
 
-        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorMessageDTO, HttpStatus.BAD_REQUEST);
     }
 }
